@@ -50,17 +50,6 @@ public class MultiPanelFrame extends JFrame {
         // Add the top-level split pane to the frame
         add(splitPane5);
 
-        // Add a button to switch modes
-        JButton switchModeButton = new JButton("Switch Panel 1 to Mode 2");
-        switchModeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panelModeSetup.switchMode("Mode2");
-            }
-        });
-
-        add(switchModeButton, BorderLayout.SOUTH);
-
         setVisible(true);
     }
 
