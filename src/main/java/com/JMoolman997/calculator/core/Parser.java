@@ -27,63 +27,58 @@ class Parser {
         }
     }
 
-    private double factor() {
+    private ASTNode factor() {
         Token token = currentToken;
         if (token.type == TokenType.NUMBER) {
             eat(TokenType.NUMBER);
-            return Double.parseDouble(token.value);
+            return new NumberNode(Double.parseDouble(token.value));
+        } else if (token.type == TokenType.IDENTIFIER) {
+            eat(TokenType.IDENTIFIER);
+            return new VariableNode(token.value);
         } else if (token.type == TokenType.LPAREN) {
             eat(TokenType.LPAREN);
-            double result = expression();
+            ASTNode node = expression();
             eat(TokenType.RPAREN);
-            return result;
+            return node;
+        } else if (token.type == TokenType.MINUS) {
+            eat(TokenType.MINUS);
+            return new UnaryOpNode("-", factor());
         }
         throw new RuntimeException("Unexpected token: " + token.type);
     }
 
-    private double term() {
-        double result = factor();
+    private ASTNode term() {
+        ASTNode node = factor();
         while (currentToken.type == TokenType.MULTIPLY || currentToken.type == TokenType.DIVIDE) {
             Token token = currentToken;
             if (token.type == TokenType.MULTIPLY) {
                 eat(TokenType.MULTIPLY);
-                result *= factor();
+                node = new BinaryOpNode("*", node, factor());
             } else if (token.type == TokenType.DIVIDE) {
                 eat(TokenType.DIVIDE);
-                result /= factor();
+                node = new BinaryOpNode("/", node, factor());
             }
         }
-        return result;
+        return node;
     }
 
-    private double expression() {
-        double result = term();
+    private ASTNode expression() {
+        ASTNode node = term();
         while (currentToken.type == TokenType.PLUS || currentToken.type == TokenType.MINUS) {
             Token token = currentToken;
             if (token.type == TokenType.PLUS) {
                 eat(TokenType.PLUS);
-                result += term();
+                node = new BinaryOpNode("+", node, term());
             } else if (token.type == TokenType.MINUS) {
                 eat(TokenType.MINUS);
-                result -= term();
+                node = new BinaryOpNode("-", node, term());
             }
         }
-        return result;
+        return node;
     }
 
-    double parse() {
+    ASTNode parse() {
         return expression();
     }
 }
-class Main {
-    public static void main(String[] args) {
-        String input = "3 + 5 * (2 - 8)";
-        Lexer lexer = new Lexer(input);
-        List<Token> tokens = lexer.tokenize();
 
-        Parser parser = new Parser(tokens);
-        double result = parser.parse();
-
-        System.out.println("Result: " + result);
-    }
-}
