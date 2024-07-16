@@ -4,9 +4,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
+// import java.util.function.Function;
 
 class Evaluator implements ASTVisitor<Double> {
+    private final Map<String, UnaryOperator<Double>> unaryFunctions;
+    private final Map<String, BinaryOperator<Double>> binaryFunctions;
+    // private final Map<String, Function<Double, Double>> mathFunctions;
     private final Map<String, Double> variables = new HashMap<>();
+   
+    public Evaluator() {
+        // Initialize unary functions
+        unaryFunctions = new HashMap<>();
+        unaryFunctions.put("sin", Math::sin);
+        unaryFunctions.put("cos", Math::cos);
+        unaryFunctions.put("tan", Math::tan);
+        unaryFunctions.put("csc", x -> 1 / Math.sin(x));
+        unaryFunctions.put("sec", x -> 1 / Math.cos(x));
+        unaryFunctions.put("cot", x -> 1 / Math.tan(x));
+        unaryFunctions.put("asin", Math::asin);
+        unaryFunctions.put("acos", Math::acos);
+        unaryFunctions.put("atan", Math::atan);
+        unaryFunctions.put("abs", Math::abs);
+        unaryFunctions.put("sqrt", Math::sqrt);
+
+        binaryFunctions = new HashMap<>();
+        binaryFunctions.put("+", (a, b) -> a + b);
+        binaryFunctions.put("-", (a, b) -> a - b);
+        binaryFunctions.put("*", (a, b) -> a * b);
+        binaryFunctions.put("/", (a, b) -> a / b);
+        binaryFunctions.put("^", (a, b) -> Math.pow(a, b));
+        
+    }
 
     @Override
     public Double visitNumberNode(NumberNode node) {
@@ -25,22 +55,13 @@ class Evaluator implements ASTVisitor<Double> {
     @Override
     public Double visitBinaryOpNode(BinaryOpNode node) {
         List<ASTNode> children = node.getChildren();
-        double left = children.get(0).accept(this);
-        double right = children.get(1).accept(this);
-        switch (node.operator) {
-            case "+":
-                return left + right;
-            case "-":
-                return left - right;
-            case "*":
-                return left * right;
-            case "/":
-                if (right == 0) {
-                    throw new IllegalArgumentException("Division by zero");
-                }
-                return left / right;
-            default:
-                throw new IllegalArgumentException("Unknown operator: " + node.operator);
+        double leftValue = children.get(0).accept(this);
+        double rightValue = children.get(1).accept(this);
+
+        if (binaryFunctions.containsKey(node.operator)) {
+            return binaryFunctions.get(node.operator).apply(leftValue, rightValue);
+        } else {
+            throw new IllegalArgumentException("Unknown binary operator: " + node.operator);
         }
     }
 
