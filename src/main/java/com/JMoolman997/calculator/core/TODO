@@ -1,0 +1,11 @@
+TODO
+
+_Espressionn Evaluator_
+ -- Lexer --
+ -Token interface
+    -getType
+    -checkValid
+    -toString
+    -Function
+    -Operator
+    -Variable
