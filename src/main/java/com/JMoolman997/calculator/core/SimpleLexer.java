@@ -48,45 +48,15 @@ public class SimpleLexer implements Lexer {
 
             currentTokenBuilder.append(currentChar);
             String currentTokenString = currentTokenBuilder.toString();
-            
-            // Try to match the current token string with any token prototype
-            // Token matchedToken = null;
-            // for (Token prototype : tokenPrototypes) {
-            //     if (prototype.matches(currentTokenString)) {
-            //         matchedToken = prototype;
-            //         break;
-            //     }
-            // }
             Token matchedToken = findMatchedToken(currentTokenString);
 
             // Continue to the next character if a match is found
             if (matchedToken != null) {
                 pos++;
-            // If no match is found, finalize the previous valid token    
-            // } else if (currentTokenBuilder.length() > 1) {
-            //     currentTokenBuilder.setLength(currentTokenBuilder.length() - 1);
-            //     String finalTokenString = currentTokenBuilder.toString();
-            //     // Token finalToken = null;
-            //     // for (Token prototype : tokenPrototypes) {
-            //     //     if (prototype.matches(finalTokenString)) {
-            //     //         finalToken = prototype.createToken(finalTokenString);
-            //     //         break;
-            //     //     }
-            //     // }
-            //     Token finalToken = createFinalToken(finalTokenString);
-            //     if (finalToken != null) {
-            //         tokens.add(finalToken);
-            //         currentTokenBuilder = new StringBuilder();  // Reset the builder after adding the token
-            //     } else {
-            //         throw new RuntimeException("Invalid token: " + finalTokenString);
-            //     }
-            // } else {
-            //     throw new RuntimeException("Unexpected character: " + currentChar);
-            // }
-        } else {
-            // Handle unmatched token scenario
-            handleUnmatchedToken(tokens, currentTokenBuilder, currentChar);
-        }
+            } else {
+                // Handle unmatched token scenario
+                handleUnmatchedToken(tokens, currentTokenBuilder, currentChar);
+            }
         }
 
         // Handle any remaining token after the loop
